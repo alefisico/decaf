@@ -140,9 +140,9 @@ class AnalysisProcessor(processor.ProcessorABC):
         }
 
 
-        self._corrections = corrections
-        self._ids = ids
-        self._common = common
+        self._corrections = load(corrections)
+        self._ids = load(ids)
+        self._common = load(common)
 
         ptbins=[8.0,
                 15.0,
@@ -178,7 +178,7 @@ class AnalysisProcessor(processor.ProcessorABC):
                 1160.0, 
                 1250.0]
 
-        self.make_output = lambda: {
+        self.make_output = {
             'sumw': 0.,
             'met': hist.Hist(
                 hist.axis.StrCategory([], name='region', growth=True),
@@ -255,7 +255,7 @@ class AnalysisProcessor(processor.ProcessorABC):
                 hist.axis.Regular(64,-3.2,3.2, name='l1phi', label='Leading Lepton Phi'),
                 storage=hist.storage.Weight(),
             ),
-    }
+        }
 
     def process(self, events):
         isData = not hasattr(events, "genWeight")
@@ -318,6 +318,7 @@ class AnalysisProcessor(processor.ProcessorABC):
         #Getting corrections, ids from .coffea files
         ###
 
+        logging.info(self._corrections)
         get_ele_loose_id_sf      = self._corrections['get_ele_loose_id_sf']
         get_ele_tight_id_sf      = self._corrections['get_ele_tight_id_sf']
         get_ele_trig_weight      = self._corrections['get_ele_trig_weight']
@@ -861,9 +862,9 @@ if __name__ == '__main__':
         samplefiles = json.load(fin)
         xsec = {k: v['xs'] for k,v in samplefiles.items()}
 
-    corrections = load('data/corrections.coffea')
-    ids         = load('data/ids.coffea')
-    common      = load('data/common.coffea')
+    corrections = 'data/corrections.coffea'
+    ids         = 'data/ids.coffea'
+    common      = 'data/common.coffea'
 
     processor_instance=AnalysisProcessor(year=options.year,
                                          xsec=xsec,
